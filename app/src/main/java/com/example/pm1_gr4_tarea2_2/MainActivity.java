@@ -1,5 +1,6 @@
 package com.example.pm1_gr4_tarea2_2;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -66,28 +67,14 @@ public class MainActivity extends AppCompatActivity {
                 listView.setAdapter(adapter);
 
                 listView.setOnItemClickListener((parent, view, position, id) -> {
-                    // Obtener el ID real del post según la posición
-                    int postId = posts.get(position).getId();
+                    Post selectedPost = posts.get(position);
 
-                    // Llamada a la API para obtener un post individual
-                    Call<Post> callPost = api.getPost(postId);
-                    callPost.enqueue(new Callback<Post>() {
-                        @Override
-                        public void onResponse(Call<Post> call, Response<Post> response) {
-                            if (response.isSuccessful()) {
-                                Post post = response.body();
-                                // Mostrar detalle en un Toast (puedes abrir otra Activity si quieres)
-                                Toast.makeText(MainActivity.this,
-                                        "Título: " + post.getTitle() + "\n\n" + post.getBody(),
-                                        Toast.LENGTH_LONG).show();
-                            }
-                        }
-
-                        @Override
-                        public void onFailure(Call<Post> call, Throwable t) {
-                            Toast.makeText(MainActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
-                        }
-                    });
+                    Intent intent = new Intent(MainActivity.this, PostDetailActivity.class);
+                    intent.putExtra("userId", selectedPost.getUserId());
+                    intent.putExtra("id", selectedPost.getId());
+                    intent.putExtra("title", selectedPost.getTitle());
+                    intent.putExtra("body", selectedPost.getBody());
+                    startActivity(intent);
                 });
             }
 
@@ -103,7 +90,8 @@ public class MainActivity extends AppCompatActivity {
     private List<String> convertPostsToTitles(List<Post> posts) {
         List<String> titles = new ArrayList<>();
         for (Post p : posts) {
-            titles.add(p.getTitle());
+            // titles.add(p.getTitle());
+            titles.add("ID " + p.getId() + ": " + p.getTitle());
         }
         return titles;
     }
